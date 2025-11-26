@@ -54,4 +54,6 @@ export const budgetReducer = (
       modal: !state.modal
     }
   }
+
+  return state;
 }
