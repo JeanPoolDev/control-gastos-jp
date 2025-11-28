@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { categories } from "../data/categories";
 import type { DraftExpense } from "@/types";
 import { ErrorMessage } from "./ErrorMessage";
@@ -15,7 +15,17 @@ export function ExpenseForm() {
 
   const [expense, setExpense] = useState(initalValue);
   const [error, setError] = useState<string>();
-  const { dispatch } = useBudget();
+  const { dispatch, state } = useBudget();
+
+  useEffect(() => {
+    if (!state.idExpense) return;
+
+    const expenseFound = state.expense.find(exp => exp.id === state.idExpense);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (expenseFound) setExpense(expenseFound)
+  }, [state.idExpense]);
+
+
 
   const handleChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
 
@@ -36,7 +46,11 @@ export function ExpenseForm() {
       return;
     }
 
-    dispatch({ type: 'add-expense', payload: { expense: expense } })
+    if (state.idExpense) {
+      dispatch({ type: 'edit-expense', payload: { expense: { id: state.idExpense, ...expense } } })
+    } else {
+      dispatch({ type: 'add-expense', payload: { expense: expense } })
+    }
 
   }
 
