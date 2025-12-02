@@ -1,26 +1,41 @@
-import type { DraftExpense, Expense } from "@/types";
+import type { Category, DraftExpense, Expense } from "@/types";
 import { v4 as uuid4 } from 'uuid'
 
 export type BudgetActions =
-  { type: 'add-budget', payload: { budget: number } } |
-  { type: 'toogle-modal', } |
-  { type: 'add-expense', payload: { expense: DraftExpense } } |
+  { type: 'set-category', payload: { idCategory: Category["id"] } } |
   { type: 'remove-expense', payload: { idExpense: Expense["id"] } } |
   { type: 'set-idExpense', payload: { idExpense: Expense["id"] } } |
-  { type: 'edit-expense', payload: { expense: Expense } }
+  { type: 'add-expense', payload: { expense: DraftExpense } } |
+  { type: 'edit-expense', payload: { expense: Expense } } |
+  { type: 'add-budget', payload: { budget: number } } |
+  { type: 'reset-app' } |
+  { type: 'toogle-modal', }
+
 
 export type BudgetState = {
   budget: number;
   modal: boolean;
   expense: Expense[];
   idExpense: Expense["id"];
+  idCategory: Category["id"];
+}
+
+const initialBudget = () => {
+  const value = localStorage.getItem('budget');
+  return value ? JSON.parse(value) : [];
+}
+
+const initialExpenses = () => {
+  const value = localStorage.getItem('expenses');
+  return value ? JSON.parse(value) : [];
 }
 
 export const initialState: BudgetState = {
-  budget: 0,
+  budget: initialBudget(),
   modal: false,
-  expense: [],
-  idExpense: ''
+  expense: initialExpenses(),
+  idExpense: '',
+  idCategory: '',
 }
 
 const createExpense = (drafExpense: DraftExpense): Expense => {
@@ -81,6 +96,22 @@ export const budgetReducer = (
     return {
       ...state,
       modal: !state.modal
+    }
+  }
+
+  if (action.type === 'reset-app') {
+    return {
+      budget: 0,
+      modal: false,
+      expense: [],
+      idExpense: ''
+    }
+  }
+
+  if (action.type === 'set-category') {
+    return {
+      ...state,
+      idCategory: action.payload.idCategory
     }
   }
 

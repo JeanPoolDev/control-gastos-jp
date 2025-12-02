@@ -15,14 +15,19 @@ export function ExpenseForm() {
 
   const [expense, setExpense] = useState(initalValue);
   const [error, setError] = useState<string>();
-  const { dispatch, state } = useBudget();
+  const [prevAmount, setPrevAmount] = useState<number>(0);
+  const { dispatch, state, totalDisponible } = useBudget();
 
   useEffect(() => {
     if (!state.idExpense) return;
 
     const expenseFound = state.expense.find(exp => exp.id === state.idExpense);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (expenseFound) setExpense(expenseFound)
+
+    if (expenseFound) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setExpense(expenseFound);
+      setPrevAmount(expenseFound.amount);
+    }
   }, [state.idExpense]);
 
 
@@ -46,18 +51,26 @@ export function ExpenseForm() {
       return;
     }
 
+    if ((expense.amount - prevAmount) > totalDisponible) {
+      setError('Este gasto se sale del presupuesto');
+      return;
+    }
+
     if (state.idExpense) {
       dispatch({ type: 'edit-expense', payload: { expense: { id: state.idExpense, ...expense } } })
     } else {
       dispatch({ type: 'add-expense', payload: { expense: expense } })
     }
 
+    setExpense(initalValue);
+    setPrevAmount(0);
   }
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit}>
+
       <legend className="text-3xl text-center font-bold border-b-4 border-blue-600">
-        Nuevo Gasto
+        {state.idExpense ? 'Editar Gasto' : 'Guardar Gasto'}
       </legend>
 
       {error && <ErrorMessage>{error}</ErrorMessage>}

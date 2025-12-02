@@ -3,7 +3,9 @@ import { budgetReducer, initialState, type BudgetActions, type BudgetState } fro
 
 interface ContextProps {
   state: BudgetState,
-  dispatch: Dispatch<BudgetActions>
+  dispatch: Dispatch<BudgetActions>,
+  totalDisponible: number,
+  totalGastado: number
 }
 
 interface ProviderProps {
@@ -16,11 +18,16 @@ export function BudgetProvider({ children }: ProviderProps) {
 
   const [state, dispatch] = useReducer(budgetReducer, initialState);
 
+  const totalGastado = state.expense.reduce((acc, { amount }) => acc + amount, 0);
+  const totalDisponible = state.budget - totalGastado;
+
   return (
     <BudgetContext.Provider
       value={{
         state,
-        dispatch
+        dispatch,
+        totalDisponible,
+        totalGastado
       }}
     >
       {children}

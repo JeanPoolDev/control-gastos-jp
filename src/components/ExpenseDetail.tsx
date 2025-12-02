@@ -28,7 +28,7 @@ export function ExpenseDetail({ expense }: Props) {
   const loadingActions = () => (
     <LeadingActions>
       <SwipeAction onClick={() => dispatch({ type: 'set-idExpense', payload: { idExpense: expense.id } })}>
-        Actulizar
+        Actualizar
       </SwipeAction>
     </LeadingActions>
   )

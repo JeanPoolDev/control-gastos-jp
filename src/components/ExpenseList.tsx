@@ -5,7 +5,12 @@ export function ExpenseList() {
 
   const { state } = useBudget();
 
-  const isEmpty = state.expense.length > 0;
+  const budgetFilter =
+    state.idCategory
+      ? state.expense.filter((exp) => exp.category == state.idCategory)
+      : state.expense
+
+  const isEmpty = budgetFilter.length > 0;
 
   return (
     <div>
@@ -19,7 +24,7 @@ export function ExpenseList() {
 
             <div className="pb-25 space-y-7">
               {
-                state.expense.map((expense) => (
+                budgetFilter.map((expense) => (
                   <ExpenseDetail key={expense.id} expense={expense} />
                 ))
               }
